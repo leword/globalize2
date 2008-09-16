@@ -17,6 +17,7 @@ module Globalize
             class_inheritable_accessor :options
             extend ClassMethods
             include InstanceMethods
+            alias_method_chain :to_xml, :translated_fields
              
             proxy_class = globalize_create_proxy_class
             has_many :globalize_translations, :class_name => proxy_class.name
@@ -63,6 +64,11 @@ module Globalize
       
       module InstanceMethods
         def locale; I18n.locale end   # Probably should save original locale here
+        
+        def to_xml_with_translated_fields(args={})
+          to_xml_without_translated_fields args.merge(:methods=>self.class.options) 
+        end
+        
         
         private
         def globalize_save_translations
