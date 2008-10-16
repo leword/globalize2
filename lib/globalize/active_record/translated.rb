@@ -21,6 +21,11 @@ module Globalize
              
             proxy_class = globalize_create_proxy_class
             has_many :globalize_translations, :class_name => proxy_class.name
+            named_scope :available_in_locale, lambda { 
+              { :joins=>:globalize_translations,
+                 :conditions=>["#{proxy_class.table_name}.locale=?", ::I18n.locale] }
+            }
+            
           end
           self.options = options
           globalize_define_accessors(options)
@@ -69,9 +74,14 @@ module Globalize
           to_xml_without_translated_fields args.merge(:methods=>self.class.options) 
         end
         
+        def save_without_translations
+          @dont_save_translations = true 
+          save
+        end
         
         private
         def globalize_save_translations
+          return true if @dont_save_translations
           gt = globalize_translations.find_or_initialize_by_locale locale
           self.class.options.each do |attr_name|
             gt[attr_name] = send(attr_name)
