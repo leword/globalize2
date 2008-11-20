@@ -3,7 +3,13 @@ module Globalize
     module ActiveRecord
       module Translated
         def self.included(base)
-          base.extend ActMethods
+          base.extend ActMethods   
+          base.class_eval do
+            def to_xml_with_translated_fields(args={})
+              to_xml_without_translated_fields args.merge(:methods=>self.class.options) 
+            end
+          end
+          base.alias_method_chain :to_xml, :translated_fields
         end
 
         module ActMethods
@@ -22,7 +28,11 @@ module Globalize
                   find :all, :conditions => { :locale => locales.map(&:to_s) }
                 end
               end
-
+               
+              named_scope :available_in_locale, lambda { 
+                { :joins=>:globalize_translations,
+                   :conditions=>["#{proxy_class.table_name}.locale=?", ::I18n.locale] }
+              }
               after_save do |record|
                 record.globalize.update_translations!
               end
@@ -36,7 +46,9 @@ module Globalize
         module InstanceMethods
           def globalize
             @globalize ||= Adapter.new self
-          end
+          end      
+          
+
         end
       end
     end
