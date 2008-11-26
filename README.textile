@@ -10,7 +10,7 @@ All features and tools in Globalize2 are implemented in the most unobstrusive an
 
 h2. Requirements
 
-Rails 2.2 (currently Rails edge)
+Rails 2.2
 
 h2. Installation
 
