@@ -8,7 +8,13 @@ module Globalize
     module ActiveRecord
       class << self
         def create_proxy_class(klass)
-          Object.const_set "#{klass.name}Translation", Class.new(::ActiveRecord::Base){
+          proxy = begin
+            Object.const_get("#{klass.name}Translation")
+          rescue NameError => e
+            Object.const_set "#{klass.name}Translation", Class.new(::ActiveRecord::Base)
+          end
+          
+          proxy.class_eval {
             belongs_to "#{klass.name.underscore}".intern
             
             def locale
@@ -19,6 +25,7 @@ module Globalize
               write_attribute(:locale, locale.to_s)
             end
           }
+          proxy
         end
 
         def define_accessors(klass, attr_names)
