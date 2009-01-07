@@ -29,7 +29,7 @@ module Globalize
                 end
               end
                
-              named_scope :available_in_locale, lambda { 
+              named_scope :in_locale, lambda { 
                 { :joins=>:globalize_translations,
                    :conditions=>["#{proxy_class.table_name}.locale=?", ::I18n.locale] }
               }
