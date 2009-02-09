@@ -6,7 +6,7 @@ module Globalize
           base.extend ActMethods   
           base.class_eval do
             def to_xml_with_translated_fields(args={})
-              to_xml_without_translated_fields args.merge(:methods=>self.class.options) 
+              to_xml_without_translated_fields args.merge(:methods=>self.class.globalize_options[:translated_attributes]) 
             end
           end
           base.alias_method_chain :to_xml, :translated_fields
