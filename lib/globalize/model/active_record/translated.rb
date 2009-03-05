@@ -14,8 +14,13 @@ module Globalize
             def to_xml_with_translated_fields(args={})
               to_xml_without_translated_fields args.merge(:methods=>self.class.globalize_options[:translated_attributes]) 
             end
+            base.alias_method_chain :to_xml, :translated_fields
+
+            def to_json_with_translated_fields(args={})
+              to_json_without_translated_fields args.merge(:methods=>self.class.globalize_options[:translated_attributes]) 
+            end
+            base.alias_method_chain :to_json, :translated_fields
           end
-          base.alias_method_chain :to_xml, :translated_fields
         end
 
         module ActMethods
