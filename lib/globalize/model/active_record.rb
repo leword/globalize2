@@ -6,7 +6,7 @@ require 'globalize/model/active_record/translated'
 module Globalize
   module Model
     module ActiveRecord
-      class << self
+      class << self                
         def create_proxy_class(klass)
           proxy = begin
             Object.const_get("#{klass.name}Translation")
@@ -31,10 +31,11 @@ module Globalize
         def define_accessors(klass, attr_names)
           attr_names.each do |attr_name|
             klass.send :define_method, attr_name, lambda {
-              globalize.fetch I18n.locale, attr_name
+              globalize.fetch self.class.locale, attr_name
             }
             klass.send :define_method, "#{attr_name}=", lambda {|val|
-              globalize.stash I18n.locale, attr_name, val
+              globalize.stash self.class.locale, attr_name, val
+              self[attr_name] = val
             }
           end
         end
