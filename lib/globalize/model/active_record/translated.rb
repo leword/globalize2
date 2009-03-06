@@ -45,6 +45,12 @@ module Globalize
             self.globalize_options = options
             Globalize::Model::ActiveRecord.define_accessors(self, attr_names)
             
+            # in_locale convenience
+            named_scope :in_locale, lambda { 
+               { :joins=>:globalize_translations,
+                  :conditions=>["#{self.globalize_proxy.table_name}.locale=?", ::I18n.locale] }
+            }       
+
             # Import any callbacks that have been defined by extensions to Globalize2
             # and run them.
             extend Callbacks
@@ -57,7 +63,7 @@ module Globalize
           
           def locale
             (defined?(@@locale) && @@locale) || I18n.locale
-          end          
+          end   
         end
 
         # Dummy Callbacks module. Extensions to Globalize2 can insert methods into here
